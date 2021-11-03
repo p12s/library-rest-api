@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+  db:
+    restart: always
+    image: postgres:latest
+    networks:
+      new:
+        aliases:
+          - database
+    volumes:
+      - ./.database/postgres/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=qwerty
+    ports:
+      - 5432:5432
+  db-migrations:
+    image: migrate/migrate:latest
+    environment:
+      - DB_PASSWORD=qwerty
+    env_file:
+      - ./.env
+    networks:
+      - new
+    volumes:
+      - ./schema:/migrations
+    command: sh -c "./wait-for-postgres.sh db; /db-migrations" && [ "-path", "/migrations/", "-database",  "postgres://postgres:qwerty@localhost:5432/postgres?sslmode=disable", "up" ]
+    depends_on:
+      - db
+  app:
+    build: ./
+    networks:
+      - new
+    command: sh -c "./wait-for-postgres.sh db; ./app"
+    ports:
+      - 80:80
+    depends_on:
+      - db
+      - db-migrations
+    environment:
+      - DB_PASSWORD=qwerty
+
+networks:
+  new:

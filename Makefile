@@ -1,6 +1,9 @@
 .PHONY:
 .SILENT:
 
+run:
+	go run cmd/main.go
+	
 test:
 	env GO111MODULE=on go test --short -race -coverprofile=cover.out -v ./...
 	make test.coverage
