@@ -1,0 +1,604 @@
+{
+	"info": {
+		"_postman_id": "1ac0f2c2-8a1f-4a65-9b68-d052f12a78de",
+		"name": "Integration tests REST-API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"",
+							"pm.test(\"Health Ok\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const response = pm.response.json()",
+							"pm.test(\"And return text OK\", () => {",
+							"    pm.expect(response.status).to.eql(\"OK\");",
+							"})",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/health",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SignUp",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"requestJson = JSON.parse(pm.request.body.raw)",
+							"pm.collectionVariables.set(\"username\", requestJson.username);",
+							"pm.collectionVariables.set(\"password\", requestJson.password);",
+							"",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"",
+							"pm.test(\"SignUp Ok\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const response = pm.response.json()",
+							"pm.test(\"And return created user id\", () => {",
+							"    isNumber = Number.isInteger(response.id)",
+							"    pm.expect(isNumber).to.be.true",
+							"",
+							"    pm.collectionVariables.set(\"created_user_id\", response.id);",
+							"})",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\" : \"{{$randomFirstName}} {{$randomLastName}}\",\n    \"username\" : \"{{$randomUserName}}\",\n\t\"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/auth/sign-up",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"auth",
+						"sign-up"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SignIn",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"",
+							"pm.test(\"SignIn Ok\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const response = pm.response.json()",
+							"pm.test(\"Returned token is not empty\", () => {",
+							"    pm.expect(response.token).not.eq(\"\");",
+							"})",
+							"pm.collectionVariables.set(\"token\", response.token);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/auth/sign-in",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"auth",
+						"sign-in"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateBook",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"requestJson = JSON.parse(pm.request.body.raw)",
+							"pm.collectionVariables.set(\"book_title\", requestJson.title);",
+							"pm.collectionVariables.set(\"first_author_first_name\", requestJson.authors[0].first_name);",
+							"pm.collectionVariables.set(\"first_author_second_name\", requestJson.authors[0].second_name);",
+							"pm.collectionVariables.set(\"second_author_first_name\", requestJson.authors[1].first_name);",
+							"pm.collectionVariables.set(\"second_author_second_name\", requestJson.authors[1].second_name);",
+							"",
+							"const response = pm.response.json()",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"",
+							"pm.test(\"CreateBook Ok\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"And return created book id\", () => {",
+							"    isNumber = Number.isInteger(response.id)",
+							"    pm.expect(isNumber).to.be.true",
+							"",
+							"    pm.collectionVariables.set(\"created_book_id\", response.id);",
+							"})",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"{{$randomLoremWord}}\",\n    \"authors\": [\n        {\n            \"first_name\": \"{{$randomFirstName}}\",\n\t        \"second_name\": \"{{$randomLastName}}\"\n        },\n        {\n            \"first_name\": \"{{$randomFirstName}}\",\n\t        \"second_name\": \"{{$randomLastName}}\"\n        },\n        {\n            \"first_name\": \"{{$randomFirstName}}\",\n\t        \"second_name\": \"{{$randomLastName}}\"\n        }\n    ]\n}\n\n\t",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/book/",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"book",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetBookById",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"",
+							"pm.test(\"GetBookById Ok\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const response = pm.response.json()",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"",
+							"pm.test(\"GetBookById Ok\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"And return created book id\", () => {",
+							"    isNumber = Number.isInteger(response.id);",
+							"    pm.expect(isNumber).to.be.true;",
+							"",
+							"    pm.expect(response.id).to.eql(pm.collectionVariables.get(\"created_book_id\"));",
+							"    pm.expect(response.title).to.be.not.empty;",
+							"})",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/book/{{created_book_id}}",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"book",
+						"{{created_book_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAllBooks",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"",
+							"pm.test(\"GetAllBooks Ok\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const response = pm.response.json()",
+							"pm.test(\"Returns book list\", () => {",
+							"    for (i = 0; i < response.length; i++) {",
+							"        isNumber = Number.isInteger(response[i].id);",
+							"        pm.expect(isNumber).to.be.true;",
+							"",
+							"        pm.expect(response[i].title).to.be.not.empty;",
+							"    }",
+							"})",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/book/",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"book",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateBook",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"",
+							"pm.test(\"UpdateBook Ok\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const response = pm.response.json()",
+							"pm.test(\"And return status OK\", () => {",
+							"    pm.expect(response.status).to.eql(\"OK\");",
+							"})",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"labore hello 2\",\n    \"authors\": [\n        {\n            \"first_name\": \"{{$randomFirstName}}\",\n\t        \"second_name\": \"{{$randomLastName}}\"\n        },\n        {\n            \"first_name\": \"{{$randomFirstName}}\",\n\t        \"second_name\": \"{{$randomLastName}}\"\n        }\n    ]\n}\n\n\t",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/book/{{created_book_id}}",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"book",
+						"{{created_book_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteBook",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"",
+							"pm.test(\"DeleteBook Ok\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const response = pm.response.json()",
+							"pm.test(\"And return status OK\", () => {",
+							"    pm.expect(response.status).to.eql(\"OK\");",
+							"",
+							"    pm.expect(response.id).to.eql(pm.collectionVariables.set(\"---\"));",
+							"})",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/api/book/{{created_book_id}}",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"book",
+						"{{created_book_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": "---"
+		},
+		{
+			"key": "protocol",
+			"value": "http"
+		},
+		{
+			"key": "host",
+			"value": "localhost"
+		},
+		{
+			"key": "port",
+			"value": "80"
+		},
+		{
+			"key": "password",
+			"value": "qwerty"
+		},
+		{
+			"key": "username",
+			"value": "---"
+		},
+		{
+			"key": "created_book_id",
+			"value": "---"
+		},
+		{
+			"key": "first_author_first_name",
+			"value": "---"
+		},
+		{
+			"key": "first_author_second_name",
+			"value": "---"
+		},
+		{
+			"key": "second_author_first_name",
+			"value": "---"
+		},
+		{
+			"key": "second_author_second_name",
+			"value": "---"
+		},
+		{
+			"key": "book_title",
+			"value": "---"
+		},
+		{
+			"key": "created_user_id",
+			"value": "---"
+		},
+		{
+			"key": "---",
+			"value": ""
+		}
+	]
+}
