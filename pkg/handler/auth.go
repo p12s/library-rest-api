@@ -38,7 +38,7 @@ func (h *Handler) signUp(c *gin.Context) {
 	})
 }
 
-// signInInput - данные для прохождения авторизации
+// signInInput - authorization data
 type signInInput struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`

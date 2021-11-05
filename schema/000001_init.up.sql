@@ -6,32 +6,22 @@ CREATE TABLE IF NOT EXISTS users
     password_hash varchar(255) not null
 );
 
-CREATE TABLE IF NOT EXISTS todo_lists
+CREATE TABLE IF NOT EXISTS book
 (
     id          serial       not null unique,
-    title       varchar(255) not null,
-    description varchar(255)
+    title       varchar(255) not null
 );
 
-CREATE TABLE IF NOT EXISTS users_lists
-(
-    id      serial                                           not null unique,
-    user_id int references users (id) on delete cascade      not null,
-    list_id int references todo_lists (id) on delete cascade not null
-);
-
-CREATE TABLE IF NOT EXISTS todo_items
+CREATE TABLE IF NOT EXISTS author
 (
     id          serial       not null unique,
-    title       varchar(255) not null,
-    description varchar(255),
-    done        boolean      not null default false
+    first_name  varchar(255) not null,
+    second_name   varchar(255) not null
 );
 
-
-CREATE TABLE IF NOT EXISTS lists_items
+CREATE TABLE IF NOT EXISTS book_author
 (
-    id      serial                                           not null unique,
-    item_id int references todo_items (id) on delete cascade not null,
-    list_id int references todo_lists (id) on delete cascade not null
+    id          serial                                       not null unique,
+    book_id     int references book (id) on delete cascade   not null,
+    author_id   int references author (id) on delete cascade not null
 );

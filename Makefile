@@ -3,9 +3,19 @@
 
 run:
 	go run cmd/main.go
-	
-test:
+
+tidy:
+	GO111MODULE=on go mod tidy
+
+unit-test:
 	env GO111MODULE=on go test --short -race -coverprofile=cover.out -v ./...
+
+integration-test:
+	newman run postman/api.postman_collection.json
+
+test:
+	make unit-test
+	make integration-test
 	make test.coverage
 
 test.coverage:

@@ -10,17 +10,16 @@ type User struct {
 
 // Book - just a book
 type Book struct {
-	Id          int      `json:"id" db:"id"`
-	Title       string   `json:"title" db:"title"`
-	Description string   `json:"description" db:"description"`
-	Authors     []Author `json:"authors" db:"authors"`
+	Id      int      `json:"id" db:"id"`
+	Title   string   `json:"title" db:"title"`
+	Authors []Author `json:"authors,omitempty" db:"authors"`
 }
 
 // Author - book author
 type Author struct {
-	Id        int    `json:"id" db:"id"`
-	FirstName string `json:"first_name" db:"first_name"`
-	LastName  string `json:"last_name" db:"last_name"`
+	Id         int    `json:"id" db:"id"`
+	FirstName  string `json:"first_name" db:"first_name"`
+	SecondName string `json:"second_name" db:"second_name"`
 }
 
 // UpdateListInput - данные для обновление списка

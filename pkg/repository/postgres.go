@@ -7,12 +7,13 @@ import (
 )
 
 const (
-	usersTable  = "users"
-	bookTable   = "book"
-	authorTable = "author"
+	usersTable      = "users"
+	bookTable       = "book"
+	authorTable     = "author"
+	bookAuthorTable = "book_author"
 )
 
-// Config - конфиг БД
+// Config - db
 type Config struct {
 	Driver   string
 	Host     string
@@ -23,7 +24,7 @@ type Config struct {
 	SSLMode  string
 }
 
-// NewPostgresDB - коннект к БД
+// NewPostgresDB - open connect and ping trying
 func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
 	db, err := sqlx.Open(cfg.Driver, fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.Username, cfg.DBName, cfg.Password, cfg.SSLMode))

@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"database/sql"
+	"fmt"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/p12s/library-rest-api/pkg/models"
 )
@@ -16,102 +19,128 @@ func NewBookPostgres(db *sqlx.DB) *BookPostgres {
 }
 
 // Create - book creating
-func (r *BookPostgres) Create(book models.Book) (int, error) {
+func (r *BookPostgres) CreateBook(book models.Book) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("create book transaction begin: %w", err)
 	}
 
-	// идем по-списку авторов, сохраняем авторов если таких нет
-	// сохраняем книгу
-	// сохраняем ид книга-автор
-	/*
-		var id int
-		createListQuery := fmt.Sprintf("INSERT INTO %s (title, description) VALUES ($1, $2) RETURNING id", todoListsTable)
-		row := tx.QueryRow(createListQuery, list.Title, list.Description)
-		if err := row.Scan(&id); err != nil {
-			rollbackErr := tx.Rollback()
-			if rollbackErr != nil {
-				return 0, rollbackErr
-			}
-			return 0, err
+	var authorIds []int
+	for _, author := range book.Authors {
+		var authorId int
+		query := fmt.Sprintf(`SELECT id FROM %s WHERE first_name = $1 AND second_name = $2`, authorTable)
+		err := r.db.Get(&authorId, query, author.FirstName, author.SecondName)
+
+		if err == nil {
+			authorIds = append(authorIds, authorId)
+			continue
 		}
 
-		createUsersListQuery := fmt.Sprintf("INSERT INTO %s (user_id, list_id) VALUES ($1, $2)", usersListsTable)
-		_, err = tx.Exec(createUsersListQuery, userId, id)
+		if err == sql.ErrNoRows {
+			createAuthorQuery := fmt.Sprintf(`INSERT INTO %s (first_name, second_name) VALUES ($1, $2) RETURNING id`, authorTable)
+			row := tx.QueryRow(createAuthorQuery, author.FirstName, author.SecondName)
+			if err := row.Scan(&authorId); err != nil {
+				rollbackErr := tx.Rollback()
+				if rollbackErr != nil {
+					return 0, fmt.Errorf("create author rollback: %w", rollbackErr)
+				}
+				return 0, fmt.Errorf("create author: %w", err)
+			}
+			authorIds = append(authorIds, authorId)
+			continue
+		}
+
 		if err != nil {
 			rollbackErr := tx.Rollback()
 			if rollbackErr != nil {
-				return 0, rollbackErr
+				return 0, fmt.Errorf("create author rollback: %w", rollbackErr)
 			}
-			return 0, err
+			return 0, fmt.Errorf("create author: %w", err)
 		}
-	*/
-	return 99, tx.Commit()
+	}
+
+	var bookId int
+	createBookQuery := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", bookTable)
+	row := tx.QueryRow(createBookQuery, book.Title)
+	if err := row.Scan(&bookId); err != nil {
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return 0, fmt.Errorf("create book rollback: %w", rollbackErr)
+		}
+		return 0, fmt.Errorf("create book: %w", err)
+	}
+
+	createBookAuthorQuery := fmt.Sprintf("INSERT INTO %s (book_id, author_id) VALUES ", bookAuthorTable)
+	for i, authorId := range authorIds {
+		createBookAuthorQuery += fmt.Sprintf("(%d, %d)", bookId, authorId)
+		if i < len(authorIds)-1 {
+			createBookAuthorQuery += ","
+		}
+	}
+
+	_, err = tx.Exec(createBookAuthorQuery)
+	if err != nil {
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return 0, fmt.Errorf("create book-author rollback: %w", rollbackErr)
+		}
+		return 0, fmt.Errorf("create book-author record: %w", err)
+	}
+
+	return bookId, tx.Commit()
 }
 
 // GetAll - getting all books
-func (r *BookPostgres) GetAll() ([]models.Book, error) {
-	var lists []models.Book
+func (r *BookPostgres) GetAllBook() ([]models.Book, error) {
+	var books []models.Book
 
-	// query := fmt.Sprintf("SELECT tl.id, tl.title, tl.description FROM %s tl INNER JOIN %s ul on tl.id = ul.list_id WHERE ul.user_id = $1",
-	// 	todoListsTable, usersListsTable)
-	// err := r.db.Select(&lists, query, userId)
+	query := fmt.Sprintf(`SELECT b.id, b.title
+		FROM %s b INNER JOIN %s ba on ba.book_id = b.id 
+		INNER JOIN %s a on a.id = ba.author_id
+		GROUP BY b.id, b.title
+		ORDER BY b.id ASC`,
+		bookTable, bookAuthorTable, authorTable)
+	err := r.db.Select(&books, query)
+	if err != nil {
+		return []models.Book{}, fmt.Errorf("get all books: %w", err)
+	}
 
-	return lists, nil
+	return books, nil
 }
 
 // GetById - getting book
-func (r *BookPostgres) GetById(bookId int) (models.Book, error) {
+func (r *BookPostgres) GetBookById(bookId int) (models.Book, error) {
 	var book models.Book
 
-	// query := fmt.Sprintf(`SELECT tl.id, tl.title, tl.description FROM %s tl
-	// 							INNER JOIN %s ul on tl.id = ul.list_id WHERE ul.user_id = $1 AND ul.list_id = $2`,
-	// 	todoListsTable, usersListsTable)
-	// err := r.db.Get(&list, query, userId, listId)
+	query := fmt.Sprintf(`SELECT id, title FROM %s WHERE id = $1`, bookTable)
+	err := r.db.Get(&book, query, bookId)
+	if err != nil {
+		return book, fmt.Errorf("get book by id: %w", err)
+	}
 
 	return book, nil
 }
 
 // Delete - remove book
-func (r *BookPostgres) Delete(bookId int) error {
-	// query := fmt.Sprintf("DELETE FROM %s tl USING %s ul WHERE tl.id = ul.list_id AND ul.user_id=$1 AND ul.list_id=$2",
-	// 	todoListsTable, usersListsTable)
-	// _, err := r.db.Exec(query, userId, listId)
+func (r *BookPostgres) DeleteBook(bookId int) error {
+	query := fmt.Sprintf(`DELETE FROM %s b USING %s ba WHERE b.id = ba.book_id AND b.id=$1`,
+		bookTable, bookAuthorTable)
+	_, err := r.db.Exec(query, bookId)
+	if err != nil {
+		return fmt.Errorf("delete book by id: %w", err)
+	}
 
 	return nil
 }
 
-// Update - удаление СПИСКА
-func (r *BookPostgres) Update(bookId int, book models.Book) error {
-	// setValues := make([]string, 0)
-	// args := make([]interface{}, 0)
-	// argId := 1
+// Update - change book
+func (r *BookPostgres) UpdateBook(bookId int, book models.Book) error {
+	query := fmt.Sprintf(`UPDATE %s SET title='%s' WHERE id = $1`, bookTable, book.Title)
 
-	// if input.Title != nil {
-	// 	setValues = append(setValues, fmt.Sprintf("title=$%d", argId))
-	// 	args = append(args, *input.Title)
-	// 	argId++
-	// }
+	_, err := r.db.Exec(query, bookId)
+	if err != nil {
+		return fmt.Errorf("update book by id: %w", err)
+	}
 
-	// if input.Description != nil {
-	// 	setValues = append(setValues, fmt.Sprintf("description=$%d", argId))
-	// 	args = append(args, *input.Description)
-	// 	argId++
-	// }
-
-	// // title=$1
-	// // description=$1
-	// // title=$1, description=$2
-	// setQuery := strings.Join(setValues, ", ")
-
-	// query := fmt.Sprintf("UPDATE %s tl SET %s FROM %s ul WHERE tl.id = ul.list_id AND ul.list_id=$%d AND ul.user_id=$%d",
-	// 	todoListsTable, setQuery, usersListsTable, argId, argId+1)
-	// args = append(args, listId, userId)
-
-	// logrus.Debugf("updateQuery: %s", query)
-	// logrus.Debugf("args: %s", args)
-
-	// _, err := r.db.Exec(query, args...)
 	return nil
 }

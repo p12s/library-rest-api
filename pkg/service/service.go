@@ -8,15 +8,17 @@ import (
 // Authorization - signup/signin
 type Authorization interface {
 	CreateUser(user models.User) (int, error)
+	GenerateToken(username, password string) (string, error)
+	ParseToken(token string) (int, error)
 }
 
 // Book - book commands
 type Book interface {
-	Create(book models.Book) (int, error)
-	GetAll() ([]models.Book, error)
-	GetById(bookId int) (models.Book, error)
-	Delete(bookId int) error
-	Update(bookId int, book models.Book) error
+	CreateBook(book models.Book) (int, error)
+	GetAllBook() ([]models.Book, error)
+	GetBookById(bookId int) (models.Book, error)
+	DeleteBook(bookId int) error
+	UpdateBook(bookId int, book models.Book) error
 }
 
 // Author - author commands (not implemented, because is not required)
@@ -34,8 +36,7 @@ type Service struct {
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
-		//Book:          NewBookService(repos.Book, repos.Author),
-		Book:   NewBookService(repos.Book),
-		Author: NewAuthorService(repos.Author),
+		Book:          NewBookService(repos.Book, repos.Author),
+		Author:        NewAuthorService(repos.Author),
 	}
 }

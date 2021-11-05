@@ -7,6 +7,7 @@ mem.out
 .vagrant/
 *.vdi
 **/.DS_Store
+.env
 
 cmake-build-*/
 *.iws

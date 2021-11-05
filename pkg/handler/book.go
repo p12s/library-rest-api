@@ -1,132 +1,125 @@
 package handler
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
+	"github.com/p12s/library-rest-api/pkg/models"
+
 	//"github.com/p12s/library-rest-api"
 	"net/http"
 	//"strconv"
 )
 
 func (h *Handler) createBook(c *gin.Context) {
-	// userId, err := getUserId(c)
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	_, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// listId, err := strconv.Atoi(c.Param("id"))
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusBadRequest, "invalid list id param")
-	// 	return
-	// }
+	var input models.Book
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
-	// var input todo.TodoItem
-	// if err := c.BindJSON(&input); err != nil {
-	// 	newErrorResponse(c, http.StatusBadRequest, err.Error())
-	// 	return
-	// }
-
-	// id, err := h.services.TodoItem.Create(userId, listId, input)
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	id, err := h.services.CreateBook(input)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": 1,
+		"id": id,
 	})
 }
 
 func (h *Handler) getAllBooks(c *gin.Context) {
-	// userId, err := getUserId(c)
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	_, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// listId, err := strconv.Atoi(c.Param("id"))
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusBadRequest, "invalid list id param")
-	// 	return
-	// }
+	items, err := h.services.GetAllBook()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// items, err := h.services.TodoItem.GetAll(userId, listId)
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
-
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, items)
 }
 
 func (h *Handler) getBookById(c *gin.Context) {
-	// userId, err := getUserId(c)
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	_, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// itemId, err := strconv.Atoi(c.Param("id"))
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusBadRequest, "invalid item id param")
-	// 	return
-	// }
+	bookId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid item id param")
+		return
+	}
+	fmt.Println("bookid", bookId)
 
-	// item, err := h.services.TodoItem.GetById(userId, itemId)
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	item, err := h.services.GetBookById(bookId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, item)
 }
 
 func (h *Handler) updateBook(c *gin.Context) {
-	// userId, err := getUserId(c)
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	_, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// id, err := strconv.Atoi(c.Param("id"))
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusBadRequest, "invalid item id param")
-	// 	return
-	// }
+	bookId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid item id param")
+		return
+	}
 
-	// var input todo.UpdateItemInput
-	// if err := c.BindJSON(&input); err != nil {
-	// 	newErrorResponse(c, http.StatusBadRequest, err.Error())
-	// 	return
-	// }
+	var input models.Book
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
-	// if err := h.services.TodoItem.Update(userId, id, input); err != nil {
-	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	if err := h.services.UpdateBook(bookId, input); err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	c.JSON(http.StatusOK, statusResponse{"ok"})
+	c.JSON(http.StatusOK, statusResponse{"OK"})
 }
 
 func (h *Handler) deleteBook(c *gin.Context) {
-	// userId, err := getUserId(c)
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	_, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// itemId, err := strconv.Atoi(c.Param("id"))
+	bookId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid item id param")
+		return
+	}
 
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusBadRequest, "invalid item id param")
-	// 	return
-	// }
+	err = h.services.DeleteBook(bookId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// err = h.services.TodoItem.Delete(userId, itemId)
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
-
-	c.JSON(http.StatusOK, statusResponse{"ok"})
+	c.JSON(http.StatusOK, statusResponse{"OK"})
 }

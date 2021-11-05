@@ -43,7 +43,7 @@ func (s *AuthService) CreateUser(user models.User) (int, error) {
 func (s *AuthService) GenerateToken(username, password string) (string, error) {
 	user, err := s.repo.GetUser(username, generatePasswordHash(password))
 	if err != nil {
-		return "", err
+		return "", errors.New("user with this login/pass is not found")
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{

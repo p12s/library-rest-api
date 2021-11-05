@@ -15,26 +15,22 @@ import (
 	"github.com/p12s/library-rest-api/pkg/repository"
 	"github.com/p12s/library-rest-api/pkg/service"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
-	if err := initConfig(); err != nil {
-		logrus.Fatalf("error init config: %s\n", err.Error())
-	}
 	if err := godotenv.Load(); err != nil {
 		logrus.Fatalf("error loading env variables: %s\n", err.Error())
 	}
 
 	db, err := repository.NewPostgresDB(repository.Config{
-		Driver:   viper.GetString("db.driver"),
-		Host:     viper.GetString("db.host"),
-		Port:     viper.GetString("db.port"),
-		Username: viper.GetString("db.username"),
+		Driver:   os.Getenv("DB_DRIVER"),
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		Username: os.Getenv("DB_USER"),
 		Password: os.Getenv("DB_PASSWORD"),
-		DBName:   viper.GetString("db.dbname"),
-		SSLMode:  viper.GetString("db.sslmode"),
+		DBName:   os.Getenv("DB_NAME"),
+		SSLMode:  os.Getenv("DB_SSL_MODE"),
 	})
 	if err != nil {
 		logrus.Fatalf("failed to initialize db: %s\n", err.Error())
@@ -46,7 +42,7 @@ func main() {
 
 	srv := new(Server)
 	go func() {
-		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+		if err := srv.Run(os.Getenv("PORT"), handlers.InitRoutes()); err != nil { //viper.GetString("port")
 			logrus.Fatalf("error while running http server: %s\n", err.Error())
 		}
 	}()
@@ -65,13 +61,6 @@ func main() {
 	if err := db.Close(); err != nil {
 		logrus.Errorf("error occured on db connection close: %s", err.Error())
 	}
-}
-
-// initConfig - from configs/config
-func initConfig() error {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
 }
 
 // Server - http server

@@ -19,7 +19,7 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 
 // CreateUser - создание пользователя
 func (r *AuthPostgres) CreateUser(user models.User) (int, error) {
-	tx, err := r.db.Begin()
+	tx, err := r.db.Begin() // TODO убрать отсюда транзакцию в создание книги
 	if err != nil {
 		return 0, err
 	}
