@@ -3,6 +3,10 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/p12s/library-rest-api/internal/service"
+	"github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
+
+	_ "github.com/p12s/library-rest-api/docs"
 )
 
 // Handler - struct containes service
@@ -18,6 +22,8 @@ func NewHandler(services *service.Service) *Handler {
 // InitRoutes - routes
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.GET("/health", h.health)
 

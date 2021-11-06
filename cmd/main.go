@@ -17,6 +17,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// @title Library app REST-API
+// @version 0.0.1
+// @description Simple library application for adding/getting books
+// @host localhost:80
+// @BasePath /
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 	if err := godotenv.Load(); err != nil {
