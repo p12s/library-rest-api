@@ -81,13 +81,6 @@
                 "operationId": "createBook",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "List id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "Book created info",
                         "name": "input",
                         "in": "body",
@@ -522,7 +515,7 @@
     "securityDefinitions": {
         "ApiKeyAuth": {
             "type": "apiKey",
-            "name": "Authorization",
+            "name": "Bearer YOUR_TOKEN",
             "in": "header"
         }
     }

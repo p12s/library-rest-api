@@ -95,11 +95,6 @@ paths:
       description: Creating book
       operationId: createBook
       parameters:
-      - description: List id
-        in: path
-        name: id
-        required: true
-        type: integer
       - description: Book created info
         in: body
         name: input
