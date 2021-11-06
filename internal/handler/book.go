@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/p12s/library-rest-api/internal/models"
+	"github.com/sirupsen/logrus"
 )
 
 // @Summary Create
@@ -23,14 +24,16 @@ import (
 // @Failure default {object} errorResponse
 // @Router /api/book/ [post]
 func (h *Handler) createBook(c *gin.Context) {
-	_, err := getUserId(c)
+	userId, err := getUserId(c)
+	logrus.Info("User with id", userId, "create book")
+
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	var input models.Book
-	if err := c.BindJSON(&input); err != nil {
+	if err = c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -165,6 +168,7 @@ func (h *Handler) updateBook(c *gin.Context) {
 // @Router /api/book/{id} [delete]
 func (h *Handler) deleteBook(c *gin.Context) {
 	_, err := getUserId(c)
+
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

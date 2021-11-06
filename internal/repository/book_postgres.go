@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -38,17 +39,17 @@ func (r *BookPostgres) CreateBook(book models.Book) (int, error) {
 	for _, author := range book.Authors {
 		var authorId int
 		query := fmt.Sprintf(`SELECT id FROM %s WHERE first_name = $1 AND second_name = $2`, authorTable)
-		err := r.db.Get(&authorId, query, author.FirstName, author.SecondName)
+		err = r.db.Get(&authorId, query, author.FirstName, author.SecondName)
 
 		if err == nil {
 			authorIds = append(authorIds, authorId)
 			continue
 		}
 
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			createAuthorQuery := fmt.Sprintf(`INSERT INTO %s (first_name, second_name) VALUES ($1, $2) RETURNING id`, authorTable)
 			row := tx.QueryRow(createAuthorQuery, author.FirstName, author.SecondName)
-			if err := row.Scan(&authorId); err != nil {
+			if err = row.Scan(&authorId); err != nil {
 				rollbackErr := tx.Rollback()
 				if rollbackErr != nil {
 					return 0, fmt.Errorf("create author rollback: %w", rollbackErr)
@@ -71,7 +72,7 @@ func (r *BookPostgres) CreateBook(book models.Book) (int, error) {
 	var bookId int
 	createBookQuery := fmt.Sprintf(`INSERT INTO %s (title) VALUES ($1) RETURNING id`, bookTable)
 	row := tx.QueryRow(createBookQuery, book.Title)
-	if err := row.Scan(&bookId); err != nil {
+	if err = row.Scan(&bookId); err != nil {
 		rollbackErr := tx.Rollback()
 		if rollbackErr != nil {
 			return 0, fmt.Errorf("create book rollback: %w", rollbackErr)

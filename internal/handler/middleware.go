@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -46,7 +47,7 @@ func (h *Handler) userIdentity(c *gin.Context) {
 	c.Set(userCtx, userId)
 }
 
-// getUserId - getting UserId frmo context
+// getUserId - getting UserId from context
 func getUserId(c *gin.Context) (int, error) {
 	id, ok := c.Get(userCtx)
 	if !ok {
@@ -59,6 +60,6 @@ func getUserId(c *gin.Context) (int, error) {
 		newErrorResponse(c, http.StatusInternalServerError, "user id is of invalid type")
 		return 0, errors.New("user id is of invalid type")
 	}
-
+	fmt.Println("ss", idInt)
 	return idInt, nil
 }

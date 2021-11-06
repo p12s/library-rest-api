@@ -85,7 +85,7 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 
 // generatePasswordHash - hash generare from password
 func generatePasswordHash(password string) string {
-	hash := sha1.New()
+	hash := sha1.New() // #nosec
 	hash.Write([]byte(password))
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
