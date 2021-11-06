@@ -2,14 +2,13 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	_ "github.com/p12s/library-rest-api/docs"
 	"github.com/p12s/library-rest-api/internal/service"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
-
-	_ "github.com/p12s/library-rest-api/docs"
 )
 
-// Handler - struct containes service
+// Handler - struct contains service
 type Handler struct {
 	services *service.Service
 }

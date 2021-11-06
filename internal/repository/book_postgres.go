@@ -28,7 +28,7 @@ func NewBookPostgres(db *sqlx.DB) *BookPostgres {
 	return &BookPostgres{db: db}
 }
 
-// Create - book creating
+// CreateBook - book creating
 func (r *BookPostgres) CreateBook(book models.Book) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -100,7 +100,7 @@ func (r *BookPostgres) CreateBook(book models.Book) (int, error) {
 	return bookId, tx.Commit()
 }
 
-// GetAll - getting all books
+// GetAllBook - getting all books
 func (r *BookPostgres) GetAllBook() ([]models.Book, error) {
 	var books []models.Book
 
@@ -118,7 +118,7 @@ func (r *BookPostgres) GetAllBook() ([]models.Book, error) {
 	return books, nil
 }
 
-// GetById - getting book
+// GetBookById - getting book
 func (r *BookPostgres) GetBookById(bookId int) (models.Book, error) {
 	var book models.Book
 
@@ -131,7 +131,7 @@ func (r *BookPostgres) GetBookById(bookId int) (models.Book, error) {
 	return book, nil
 }
 
-// Delete - remove book
+// DeleteBook - remove book
 func (r *BookPostgres) DeleteBook(bookId int) error {
 	query := fmt.Sprintf(`DELETE FROM %s b USING %s ba WHERE b.id = ba.book_id AND b.id=$1`,
 		bookTable, bookAuthorTable)
@@ -143,7 +143,7 @@ func (r *BookPostgres) DeleteBook(bookId int) error {
 	return nil
 }
 
-// Update - change book
+// UpdateBook - change book
 func (r *BookPostgres) UpdateBook(bookId int, book models.Book) error {
 	query := fmt.Sprintf(`UPDATE %s SET title=$1 WHERE id = $2`, bookTable)
 

@@ -25,7 +25,7 @@ func NewBookService(repo repository.Book, authorRepo repository.Author) *BookSer
 	return &BookService{repo: repo, authorRepo: authorRepo}
 }
 
-// Create - create book
+// CreateBook - create book
 func (s *BookService) CreateBook(book models.Book) (int, error) {
 	// TODO in the right way I would do smt like this,
 	// so that in each file was only access to its own table:
@@ -39,24 +39,24 @@ func (s *BookService) CreateBook(book models.Book) (int, error) {
 	return s.repo.CreateBook(book)
 }
 
-// GetAll - getting all books
+// GetAllBook - getting all books
 func (s *BookService) GetAllBook() ([]models.Book, error) {
 	// TODO without adjacent authors yet
 	return s.repo.GetAllBook()
 }
 
-// GetById - get book
+// GetBookById - get book
 func (s *BookService) GetBookById(bookId int) (models.Book, error) {
 	// TODO without adjacent authors yet
 	return s.repo.GetBookById(bookId)
 }
 
-// Delete - book
+// DeleteBook - book
 func (s *BookService) DeleteBook(bookId int) error {
 	return s.repo.DeleteBook(bookId)
 }
 
-// Update - book
+// UpdateBook - book
 func (s *BookService) UpdateBook(bookId int, book models.Book) error {
 	// TODO without adjacent authors yet
 	return s.repo.UpdateBook(bookId, book)
