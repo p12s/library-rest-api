@@ -12,11 +12,10 @@ FROM alpine:latest
 
 # copy go app, config and wait-for-postgres.sh
 COPY --from=build /app /app
-COPY ./configs/ /configs/
 COPY ./.env /.env
 COPY ./wait-for-postgres.sh ./
 
 # install psql and make wait-for-postgres.sh executable
-RUN apk add --no-cache libc6-compat postgresql-client && chmod +x wait-for-postgres.sh todo-app
+RUN apk add --no-cache libc6-compat postgresql-client && chmod +x wait-for-postgres.sh app
 
 CMD ["./app"]

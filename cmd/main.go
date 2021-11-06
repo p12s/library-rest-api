@@ -50,7 +50,7 @@ func main() {
 
 	srv := new(Server)
 	go func() {
-		if err := srv.Run(os.Getenv("PORT"), handlers.InitRoutes()); err != nil { //viper.GetString("port")
+		if err := srv.Run(os.Getenv("PORT"), handlers.InitRoutes()); err != nil {
 			logrus.Fatalf("error while running http server: %s\n", err.Error())
 		}
 	}()

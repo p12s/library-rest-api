@@ -8,6 +8,7 @@ mem.out
 *.vdi
 **/.DS_Store
 .env
+.database/
 
 cmake-build-*/
 *.iws

@@ -9,7 +9,7 @@ docker exec -it PID /bin/bash
 ```
 Запускаем миграции:
 ```
-migrate -path ./schema -database 'postgres://postgres:qwerty@localhost:5432/library?sslmode=disable' up # вместо up -> down, если что-то пошло не так
+migrate -path ./schema -database 'postgres://postgres:qwerty@localhost:5432/postgres?sslmode=disable' up # вместо up -> down, если что-то пошло не так
 ```
 В контейнере можно убедиться, что БД с таблицами созданы:
 ```

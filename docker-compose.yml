@@ -24,7 +24,7 @@ services:
       - new
     volumes:
       - ./schema:/migrations
-    command: sh -c "./wait-for-postgres.sh db; /db-migrations" && [ "-path", "/migrations/", "-database",  "postgres://postgres:qwerty@localhost:5432/postgres?sslmode=disable", "up" ]
+    command: sh -c "./wait-for-postgres.sh db; /db-migrations" && [ "-path", "/migrations/", "-database",  "postgres://postgres:qwerty@db:5432/postgres?sslmode=disable", "up" ]
     depends_on:
       - db
   app:
@@ -35,7 +35,6 @@ services:
     ports:
       - 80:80
     depends_on:
-      - db
       - db-migrations
     environment:
       - DB_PASSWORD=qwerty
