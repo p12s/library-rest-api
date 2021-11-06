@@ -1,22 +1,21 @@
 <div align="center">
-  <article style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-    <h1 style="width: 100%; text-align: center;">Library REST-API</h1>
-    <p>
-      Simple REST-API server. Task description is [here](task.md)
-    </p>
-  </article>
-</div>
+<article style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+  <h1 style="width: 100%; text-align: center;">Library REST-API</h1>
+  <p>Simple REST-API server. Task description is [here](task.md)</p>
+</article>
 
 <div align="center">
-  [![GO][go-badge]] [![REPORT][report-badge]][report-url] [![LICENSE][license-badge]][license-url]
+
+[![GO][go-badge]][go-url] [![REPORT][report-badge]][report-url] [![LICENSE][license-badge]][license-url]
   
-  [license-badge]: https://img.shields.io/npm/l/@douyinfe/semi-ui
-  [license-url]: https://github.com/p12s/library-rest-api/blob/master/LICENSE
-  
-  [go-badge]: https://img.shields.io/github/go-mod/go-version/p12s/library-rest-api?style=plastic
-  
-  [report-badge]: https://goreportcard.com/badge/github.com/p12s/library-rest-api
-  [report-url]: https://goreportcard.com/report/github.com/p12s/library-rest-api
+[license-badge]: https://img.shields.io/npm/l/@douyinfe/semi-ui
+[license-url]: https://github.com/p12s/library-rest-api/blob/master/LICENSE
+[go-badge]: https://img.shields.io/github/go-mod/go-version/p12s/library-rest-api?style=plastic
+[go-url]: https://github.com/p12s/library-rest-api/blob/master/go.mod
+[report-badge]: https://goreportcard.com/badge/github.com/p12s/library-rest-api
+[report-url]: https://goreportcard.com/report/github.com/p12s/library-rest-api
+
+</div>
 </div>
 
 # 🔥 Run
