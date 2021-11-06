@@ -11,9 +11,9 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 
-	"github.com/p12s/library-rest-api/pkg/handler"
-	"github.com/p12s/library-rest-api/pkg/repository"
-	"github.com/p12s/library-rest-api/pkg/service"
+	"github.com/p12s/library-rest-api/internal/handler"
+	"github.com/p12s/library-rest-api/internal/repository"
+	"github.com/p12s/library-rest-api/internal/service"
 	"github.com/sirupsen/logrus"
 )
 
@@ -53,11 +53,9 @@ func main() {
 	<-quit
 
 	logrus.Print("app shutting down")
-
 	if err := srv.Shutdown(context.Background()); err != nil {
 		logrus.Errorf("error occured on server shutting down: %s", err.Error())
 	}
-
 	if err := db.Close(); err != nil {
 		logrus.Errorf("error occured on db connection close: %s", err.Error())
 	}

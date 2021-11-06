@@ -5,8 +5,17 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/p12s/library-rest-api/pkg/models"
+	"github.com/p12s/library-rest-api/internal/models"
 )
+
+// Book - book commands
+type Book interface {
+	CreateBook(book models.Book) (int, error)
+	GetAllBook() ([]models.Book, error)
+	GetBookById(bookId int) (models.Book, error)
+	DeleteBook(bookId int) error
+	UpdateBook(bookId int, book models.Book) error
+}
 
 // BookPostgres - repo
 type BookPostgres struct {
@@ -60,7 +69,7 @@ func (r *BookPostgres) CreateBook(book models.Book) (int, error) {
 	}
 
 	var bookId int
-	createBookQuery := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", bookTable)
+	createBookQuery := fmt.Sprintf(`INSERT INTO %s (title) VALUES ($1) RETURNING id`, bookTable)
 	row := tx.QueryRow(createBookQuery, book.Title)
 	if err := row.Scan(&bookId); err != nil {
 		rollbackErr := tx.Rollback()
@@ -70,7 +79,7 @@ func (r *BookPostgres) CreateBook(book models.Book) (int, error) {
 		return 0, fmt.Errorf("create book: %w", err)
 	}
 
-	createBookAuthorQuery := fmt.Sprintf("INSERT INTO %s (book_id, author_id) VALUES ", bookAuthorTable)
+	createBookAuthorQuery := fmt.Sprintf(`INSERT INTO %s (book_id, author_id) VALUES `, bookAuthorTable)
 	for i, authorId := range authorIds {
 		createBookAuthorQuery += fmt.Sprintf("(%d, %d)", bookId, authorId)
 		if i < len(authorIds)-1 {
@@ -135,9 +144,9 @@ func (r *BookPostgres) DeleteBook(bookId int) error {
 
 // Update - change book
 func (r *BookPostgres) UpdateBook(bookId int, book models.Book) error {
-	query := fmt.Sprintf(`UPDATE %s SET title='%s' WHERE id = $1`, bookTable, book.Title)
+	query := fmt.Sprintf(`UPDATE %s SET title=$1 WHERE id = $2`, bookTable)
 
-	_, err := r.db.Exec(query, bookId)
+	_, err := r.db.Exec(query, book.Title, bookId)
 	if err != nil {
 		return fmt.Errorf("update book by id: %w", err)
 	}

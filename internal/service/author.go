@@ -1,8 +1,12 @@
 package service
 
 import (
-	"github.com/p12s/library-rest-api/pkg/repository"
+	"github.com/p12s/library-rest-api/internal/repository"
 )
+
+// Author - author commands (not implemented, because is not required)
+type Author interface {
+}
 
 // AuthorService - just service
 type AuthorService struct {

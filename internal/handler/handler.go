@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/p12s/library-rest-api/pkg/service"
+	"github.com/p12s/library-rest-api/internal/service"
 )
 
 // Handler - struct containes service

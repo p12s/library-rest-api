@@ -1,15 +1,12 @@
 package handler
 
 import (
-	"fmt"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
-	"github.com/p12s/library-rest-api/pkg/models"
-
-	//"github.com/p12s/library-rest-api"
 	"net/http"
-	//"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/p12s/library-rest-api/internal/models"
 )
 
 func (h *Handler) createBook(c *gin.Context) {
@@ -64,7 +61,6 @@ func (h *Handler) getBookById(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, "invalid item id param")
 		return
 	}
-	fmt.Println("bookid", bookId)
 
 	item, err := h.services.GetBookById(bookId)
 	if err != nil {

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/p12s/library-rest-api/pkg/models"
-	"github.com/p12s/library-rest-api/pkg/repository"
+	"github.com/p12s/library-rest-api/internal/models"
+	"github.com/p12s/library-rest-api/internal/repository"
 )
 
 const (
@@ -21,6 +21,13 @@ const (
 type tokenClaims struct {
 	jwt.StandardClaims
 	UserId int `json:"user_id"`
+}
+
+// Authorization - signup/signin
+type Authorization interface {
+	CreateUser(user models.User) (int, error)
+	GenerateToken(username, password string) (string, error)
+	ParseToken(token string) (int, error)
 }
 
 // AuthService - service
