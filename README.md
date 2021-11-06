@@ -1,7 +1,7 @@
 <div align="center">
 <article style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
   <h1 style="width: 100%; text-align: center;">Library REST-API</h1>
-  <p>Simple REST-API server. Task description is [here](task.md)</p>
+  <p>Simple REST-API server. Task description is <a href="task.md">here</a></p>
 </article>
 
 <div align="center">
