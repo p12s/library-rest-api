@@ -1,5 +1,6 @@
 .PHONY:
 .SILENT:
+.DEFAULT_GOAL := test
 
 run:
 	go run cmd/main.go
@@ -13,13 +14,10 @@ unit-test:
 integration-test:
 	newman run postman/api.postman_collection.json
 
-test:
-	make unit-test
-	make integration-test
-	make test.coverage
-
 test.coverage:
 	env GO111MODULE=on go tool cover -func=cover.out
+
+test: unit-test integration-test test.coverage
 
 lint:
 	golangci-lint run

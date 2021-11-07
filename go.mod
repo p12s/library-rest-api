@@ -9,6 +9,7 @@ require (
 	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.3
 	github.com/sirupsen/logrus v1.8.1
+	github.com/swaggo/swag v1.7.4
 )
 
 require (
@@ -21,7 +22,6 @@ require (
 	github.com/go-openapi/swag v0.19.14 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
-	github.com/swaggo/swag v1.7.4 // indirect
 	golang.org/x/net v0.0.0-20210119194325-5f4716e94777 // indirect
 	golang.org/x/text v0.3.5 // indirect
 	golang.org/x/tools v0.1.0 // indirect

@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/p12s/library-rest-api/internal/repository"
+	"github.com/p12s/library-rest-api/pkg/repository"
 )
 
 // Service - just service

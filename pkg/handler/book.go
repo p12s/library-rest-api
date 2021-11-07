@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/p12s/library-rest-api/internal/models"
+	"github.com/p12s/library-rest-api/pkg/models"
 	"github.com/sirupsen/logrus"
 )
 

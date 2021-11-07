@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/p12s/library-rest-api/internal/models"
-	"github.com/p12s/library-rest-api/internal/repository"
+	"github.com/p12s/library-rest-api/pkg/models"
+	"github.com/p12s/library-rest-api/pkg/repository"
 )
 
 // Book - book commands

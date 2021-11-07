@@ -11,9 +11,9 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 
-	"github.com/p12s/library-rest-api/internal/handler"
-	"github.com/p12s/library-rest-api/internal/repository"
-	"github.com/p12s/library-rest-api/internal/service"
+	"github.com/p12s/library-rest-api/pkg/handler"
+	"github.com/p12s/library-rest-api/pkg/repository"
+	"github.com/p12s/library-rest-api/pkg/service"
 	"github.com/sirupsen/logrus"
 )
 

@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/p12s/library-rest-api/internal/models"
+	"github.com/p12s/library-rest-api/pkg/models"
 )
 
 // Book - book commands
