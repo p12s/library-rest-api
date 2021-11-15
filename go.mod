@@ -8,6 +8,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.3
+	github.com/p12s/in-memory-cache v1.0.6
 	github.com/sirupsen/logrus v1.8.1
 	github.com/swaggo/swag v1.7.4
 )

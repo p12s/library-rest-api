@@ -5,17 +5,24 @@ silent: true
 
 tasks:
   default:
-    desc: Lint code
+    task -l
+
+  0:
+    desc: Stop app in docker-compose
+    cmds:
+      - docker-compose down
+
+  1:
+    desc: Run app and database in docker-compose
+    cmds:
+      - docker-compose up --build
+
+  2:
+    desc: Format code
     cmds:
       - task: tidy
       - task: fmt
       - task: lint
-
-  download:
-    desc: Download external modules
-    cmds:
-      - echo "Download..."
-      - GO111MODULE=on go mod download
 
   tidy:
     cmds:
@@ -32,7 +39,7 @@ tasks:
       - echo "Lint..."
       - golangci-lint run
   
-  test:
+  3:
     desc: Run testing - unit, integration, coverage
     cmds:
       - task: test-unit
@@ -51,17 +58,13 @@ tasks:
     cmds:
       - env GO111MODULE=on go tool cover -func=cover.out
 
-  bench:
+  4:
     desc: Benchmarking
     cmds:
       - env GO111MODULE=on go test -bench=. -cpu=8 -benchmem -cpuprofile=cpu.out -memprofile=mem.out .
-  
-  run:
-    desc: Run app and database in docker-compose
+
+  5:
+    desc: Download external modules
     cmds:
-      - docker-compose up --build
-  
-  down:
-    desc: Stop app in docker-compose
-    cmds:
-      - docker-compose down
+      - echo "Download..."
+      - GO111MODULE=on go mod download

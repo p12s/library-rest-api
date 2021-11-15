@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
+	cache "github.com/p12s/in-memory-cache"
 	_ "github.com/p12s/library-rest-api/docs"
 	"github.com/p12s/library-rest-api/pkg/service"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -11,11 +14,17 @@ import (
 // Handler - struct contains service
 type Handler struct {
 	services *service.Service
+	cache    cache.Cache
 }
 
 // NewHandler - constructor
 func NewHandler(services *service.Service) *Handler {
-	return &Handler{services: services}
+	cacheCleanExpiredPeriod := 1 * time.Minute
+
+	return &Handler{
+		services: services,
+		cache:    *cache.New(cacheCleanExpiredPeriod),
+	}
 }
 
 // InitRoutes - routes

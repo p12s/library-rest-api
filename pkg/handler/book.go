@@ -2,6 +2,7 @@ package handler
 
 import (
 	"strconv"
+	"time"
 
 	"net/http"
 
@@ -68,6 +69,10 @@ func (h *Handler) getAllBooks(c *gin.Context) {
 		return
 	}
 
+	// TODO тут вопрос - стоит ли кешировать всю библиотеку. я думаю - не стоит:
+	// 1 - книг может быть много
+	// 2 - запрос может быть нечастым, а память будет занята всегда
+
 	items, err := h.services.GetAllBook()
 	if err != nil {
 		newErrorResponse(c, http.StatusNotFound, err.Error())
@@ -103,13 +108,17 @@ func (h *Handler) getBookById(c *gin.Context) {
 		return
 	}
 
-	item, err := h.services.GetBookById(bookId)
-	if err != nil {
-		newErrorResponse(c, http.StatusNotFound, err.Error())
-		return
+	book := h.cache.Get(strconv.Itoa(bookId))
+	if book == nil {
+		book, err = h.services.GetBookById(bookId)
+		if err != nil {
+			newErrorResponse(c, http.StatusNotFound, err.Error())
+			return
+		}
+		h.cache.SetWithExpire(strconv.Itoa(bookId), book, time.Hour*24)
 	}
 
-	c.JSON(http.StatusOK, item)
+	c.JSON(http.StatusOK, book)
 }
 
 // @Summary Update by id
@@ -138,6 +147,8 @@ func (h *Handler) updateBook(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, "invalid item id param")
 		return
 	}
+
+	h.cache.Delete(strconv.Itoa(bookId))
 
 	var input models.Book
 	if err := c.BindJSON(&input); err != nil {
@@ -185,6 +196,8 @@ func (h *Handler) deleteBook(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	h.cache.Delete(strconv.Itoa(bookId))
 
 	c.JSON(http.StatusOK, statusResponse{"OK"})
 }
