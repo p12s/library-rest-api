@@ -14,16 +14,16 @@ import (
 // Handler - struct contains service
 type Handler struct {
 	services *service.Service
-	cache    cache.Cache
+	cache    *cache.Cache
 }
+
+const CACHE_CLEAN_EXPIRED_PERIOD = 1 * time.Minute
 
 // NewHandler - constructor
 func NewHandler(services *service.Service) *Handler {
-	cacheCleanExpiredPeriod := 1 * time.Minute
-
 	return &Handler{
 		services: services,
-		cache:    *cache.New(cacheCleanExpiredPeriod),
+		cache:    cache.New(CACHE_CLEAN_EXPIRED_PERIOD),
 	}
 }
 

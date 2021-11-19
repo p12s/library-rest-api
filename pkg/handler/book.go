@@ -109,16 +109,18 @@ func (h *Handler) getBookById(c *gin.Context) {
 	}
 
 	book := h.cache.Get(strconv.Itoa(bookId))
-	if book == nil {
-		book, err = h.services.GetBookById(bookId)
-		if err != nil {
-			newErrorResponse(c, http.StatusNotFound, err.Error())
-			return
-		}
-		h.cache.SetWithExpire(strconv.Itoa(bookId), book, time.Hour*24)
+	if book != nil {
+		c.JSON(http.StatusOK, book)
+		return
 	}
 
-	c.JSON(http.StatusOK, book)
+	book, err = h.services.GetBookById(bookId)
+	if err != nil {
+		newErrorResponse(c, http.StatusNotFound, err.Error())
+		return
+	}
+	h.cache.SetWithExpire(strconv.Itoa(bookId), book, time.Hour*24)
+
 }
 
 // @Summary Update by id
