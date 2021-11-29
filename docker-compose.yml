@@ -28,7 +28,9 @@ services:
     depends_on:
       - db
   app:
-    build: ./
+    build:
+      context: ./library
+      dockerfile: Dockerfile
     networks:
       - new
     command: sh -c "./wait-for-postgres.sh db; ./app"
