@@ -1,4 +1,4 @@
-module github.com/p12s/library-rest-api
+module github.com/p12s/library-rest-api/library
 
 go 1.17
 

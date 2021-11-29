@@ -57,7 +57,7 @@ func main() {
 			logrus.Fatalf("error while running http server: %s\n", err.Error())
 		}
 	}()
-	logrus.Print("app started")
+	logrus.Print("app started on port ", os.Getenv("PORT"))
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
