@@ -4,9 +4,10 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/p12s/library-rest-api/pkg/models"
 	"github.com/p12s/library-rest-api/pkg/repository"
 )
@@ -14,14 +15,8 @@ import (
 const (
 	salt       = "8284kjalsdf282-4asfjae93sdf"
 	tokenTTL   = 12 * time.Hour
-	signingKey = "29dsjkadf*^(&le23#ls93s02a0d9"
+	hmacSecret = "29dsjkadf*^(&le23#ls93s02a0d9"
 )
-
-// tokenClaims - tooken object
-type tokenClaims struct {
-	jwt.StandardClaims
-	UserId int `json:"user_id"`
-}
 
 // Authorization - signup/signin
 type Authorization interface {
@@ -42,50 +37,76 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 
 // CreateUser - just creating user
 func (s *AuthService) CreateUser(user models.User) (int, error) {
-	user.Password = generatePasswordHash(user.Password)
+	passwordHash, err := s.generatePasswordHash(user.Password)
+	if err != nil {
+		return 0, fmt.Errorf("get user by creds: %w", err)
+	}
+	user.Password = passwordHash
 	return s.repo.CreateUser(user)
 }
 
 // GenerateToken - token generation
 func (s *AuthService) GenerateToken(username, password string) (string, error) {
-	user, err := s.repo.GetUser(username, generatePasswordHash(password))
+	passwordHash, err := s.generatePasswordHash(password)
 	if err != nil {
-		return "", errors.New("user with this login/pass is not found")
+		return "", fmt.Errorf("get user by creds: %w", err)
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
-			IssuedAt:  time.Now().Unix(),
-		},
-		user.Id,
+
+	user, err := s.repo.GetUser(username, passwordHash)
+	if err != nil {
+		return "", fmt.Errorf("user creds wrong: %w", err)
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{ //nolint
+		Subject:   strconv.Itoa(user.Id),
+		IssuedAt:  time.Now().Unix(),
+		ExpiresAt: time.Now().Add(tokenTTL).Unix(),
 	})
-	return token.SignedString([]byte(signingKey))
+
+	return token.SignedString([]byte(hmacSecret))
 }
 
 // ParseToken - getting authorized data from token
-func (s *AuthService) ParseToken(accessToken string) (int, error) {
-	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+
+func (s *AuthService) ParseToken(token string) (int, error) {
+	t, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("invalid signing method")
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(signingKey), nil
+		return []byte(hmacSecret), nil
 	})
 	if err != nil {
 		return 0, err
 	}
 
-	claims, ok := token.Claims.(*tokenClaims)
-	if !ok {
-		return 0, errors.New("token claims are not of type *tokenClaims")
+	if !t.Valid {
+		return 0, errors.New("invalid token")
 	}
 
-	return claims.UserId, nil
+	claims, ok := t.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, errors.New("invalid claims")
+	}
+
+	subject, ok := claims["sub"].(string)
+	if !ok {
+		return 0, errors.New("invalid subject")
+	}
+
+	id, err := strconv.Atoi(subject)
+	if err != nil {
+		return 0, errors.New("invalid subject")
+	}
+
+	return id, nil
 }
 
 // generatePasswordHash - hash generare from password
-func generatePasswordHash(password string) string {
+func (s *AuthService) generatePasswordHash(password string) (string, error) {
 	hash := sha1.New() // #nosec
-	hash.Write([]byte(password))
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+	if _, err := hash.Write([]byte(password)); err != nil {
+		return "", fmt.Errorf("hash write: %w", err)
+	}
+	return fmt.Sprintf("%x", hash.Sum([]byte(salt))), nil
 }

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -60,6 +59,5 @@ func getUserId(c *gin.Context) (int, error) {
 		newErrorResponse(c, http.StatusInternalServerError, "user id is of invalid type")
 		return 0, errors.New("user id is of invalid type")
 	}
-	fmt.Println("ss", idInt)
 	return idInt, nil
 }

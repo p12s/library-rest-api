@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "1ac0f2c2-8a1f-4a65-9b68-d052f12a78de",
-		"name": "Integration tests REST-API",
+		"name": "library-rest-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -188,10 +188,9 @@
 							"pm.test(\"And return created book id\", () => {",
 							"    isNumber = Number.isInteger(response.id)",
 							"    pm.expect(isNumber).to.be.true",
-							"",
-							"    pm.collectionVariables.set(\"created_book_id\", response.id);",
 							"})",
-							""
+							"",
+							"pm.collectionVariables.set(\"created_book_id\", response.id);"
 						],
 						"type": "text/javascript"
 					}
@@ -424,7 +423,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"title\": \"labore hello 2\",\n    \"authors\": [\n        {\n            \"first_name\": \"{{$randomFirstName}}\",\n\t        \"second_name\": \"{{$randomLastName}}\"\n        },\n        {\n            \"first_name\": \"{{$randomFirstName}}\",\n\t        \"second_name\": \"{{$randomLastName}}\"\n        }\n    ]\n}\n\n\t",
+					"raw": "{\n    \"title\": \"hello; insert into users (name, username, password_hash) values (mans, this, dedsdfdfa); select book dedededededed\",\n    \"authors\": [\n        {\n            \"first_name\": \"{{$randomFirstName}}\",\n\t        \"second_name\": \"{{$randomLastName}}\"\n        },\n        {\n            \"first_name\": \"{{$randomFirstName}}\",\n\t        \"second_name\": \"{{$randomLastName}}\"\n        }\n    ]\n}\n\n\t",
 					"options": {
 						"raw": {
 							"language": "json"

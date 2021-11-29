@@ -26,7 +26,7 @@ import (
 // @Router /api/book/ [post]
 func (h *Handler) createBook(c *gin.Context) {
 	userId, err := getUserId(c)
-	logrus.Info("User with id", userId, "create book")
+	logrus.Info("User with id ", userId, " created book")
 
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
