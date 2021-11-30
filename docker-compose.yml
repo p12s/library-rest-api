@@ -1,7 +1,6 @@
 version: '3.9'
 
 services:
-  
   # APP WITH DB
   postgres:
     restart: always
@@ -24,7 +23,6 @@ services:
     depends_on:
       - postgres
   app:
-    # restart: unless-stopped
     restart: on-failure
     build:
       context: ./library
@@ -38,7 +36,6 @@ services:
       - logger-2
     environment:
       - DB_PASSWORD=qwerty
-      # - AMQP_URL=amqp://rabbitmq?connection_attempts=5&retry_delay=5
 
   # LOGGER #1
   mongo:
@@ -76,8 +73,6 @@ services:
     build:
       context: ./logger-2
       dockerfile: Dockerfile
-    # environment:
-      # AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
     ports:
       - 82:82
     depends_on:

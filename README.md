@@ -42,7 +42,7 @@ migrate -path ./schema -database 'postgres://postgres:qwerty@localhost:5432/post
 
 # Logging
 - service **logger** - logging with gRPC, saving into MongoDB  
-- service 2 **logger-2** - logging with RabbitMQ, output into output  
+- service 2 **logger-2** - logging with RabbitMQ, simple printing into stdout  
 
 # 📌 Documentation
 * [OpenAPI](docs/README.md)
