@@ -16,6 +16,7 @@ import (
 	"github.com/p12s/library-rest-api/library/pkg/config"
 	"github.com/p12s/library-rest-api/library/pkg/grpcClient"
 	"github.com/p12s/library-rest-api/library/pkg/handler"
+	"github.com/p12s/library-rest-api/library/pkg/queueClient"
 	"github.com/p12s/library-rest-api/library/pkg/repository"
 	"github.com/p12s/library-rest-api/library/pkg/service"
 	"github.com/sirupsen/logrus"
@@ -46,12 +47,18 @@ func main() {
 		logrus.Fatalf("failed to initialize db: %s\n", err.Error())
 	}
 	repos := repository.NewRepository(db)
+
 	services := service.NewService(repos)
-	loggerService, err := grpcClient.New(*cfg)
+	grpcLogger, err := grpcClient.New(*cfg)
 	if err != nil {
 		logrus.Fatalf("failed to initialize grpc client: %s\n", err.Error())
 	}
-	handlers := handler.NewHandler(services, loggerService)
+	queueLogger, err := queueClient.New(*cfg)
+	if err != nil {
+		logrus.Fatalf("failed to initialize queue client: %s\n", err.Error())
+	}
+
+	handlers := handler.NewHandler(services, grpcLogger, queueLogger)
 
 	srv := new(Server)
 	go func() {
@@ -71,6 +78,9 @@ func main() {
 	}
 	if err := db.Close(); err != nil {
 		logrus.Errorf("error occurred on db connection close: %s", err.Error())
+	}
+	if err := queueLogger.Close(); err != nil {
+		logrus.Errorf("error occurred on queue connection close: %s", err.Error())
 	}
 }
 

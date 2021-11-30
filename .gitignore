@@ -7,8 +7,9 @@ mem.out
 .vagrant/
 *.vdi
 **/.DS_Store
-.env
+**/.env
 .database/
+.rabbitmq
 
 cmake-build-*/
 *.iws
