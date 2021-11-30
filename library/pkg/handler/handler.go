@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	cache "github.com/p12s/in-memory-cache"
 	_ "github.com/p12s/library-rest-api/library/docs"
+	"github.com/p12s/library-rest-api/library/pkg/grpcClient"
 	"github.com/p12s/library-rest-api/library/pkg/service"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
@@ -15,15 +16,17 @@ import (
 type Handler struct {
 	services *service.Service
 	cache    *cache.Cache
+	logger   *grpcClient.Client
 }
 
 const CACHE_CLEAN_EXPIRED_PERIOD = 1 * time.Minute
 
 // NewHandler - constructor
-func NewHandler(services *service.Service) *Handler {
+func NewHandler(services *service.Service, logger *grpcClient.Client) *Handler {
 	return &Handler{
 		services: services,
 		cache:    cache.New(CACHE_CLEAN_EXPIRED_PERIOD),
+		logger:   logger,
 	}
 }
 

@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package logger;
+option go_package = "./pb";
+
+import "google/protobuf/timestamp.proto";
+
+// LoggerService - gRPC services
+service LoggerService {
+  rpc Log(LoggerRequest) returns (EmptyResponse) {}
+}
+
+// LoggerRequest - catched external request
+message LoggerRequest {
+  enum Actions {
+    REGISTER = 0;
+    LOGIN = 1;
+    CREATE = 2;
+    UPDATE = 3;
+    GET = 4;
+    DELETE = 5;
+  }
+  enum Entities {
+    USER = 0;
+    BOOK = 1;
+  }
+
+  Actions action = 1;
+  Entities entity = 2;
+  int64 entity_id = 3;
+  google.protobuf.Timestamp timestamp = 4;
+}
+
+// EmptyResponse
+message EmptyResponse {
+}

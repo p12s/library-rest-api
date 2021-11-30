@@ -6,12 +6,15 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"strconv"
 	"syscall"
 	"time"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 
+	"github.com/p12s/library-rest-api/library/pkg/config"
+	"github.com/p12s/library-rest-api/library/pkg/grpcClient"
 	"github.com/p12s/library-rest-api/library/pkg/handler"
 	"github.com/p12s/library-rest-api/library/pkg/repository"
 	"github.com/p12s/library-rest-api/library/pkg/service"
@@ -28,36 +31,35 @@ import (
 // @name Authorization
 func main() {
 	runtime.GOMAXPROCS(1)
-
 	logrus.SetFormatter(new(logrus.JSONFormatter))
+
 	if err := godotenv.Load(); err != nil {
+		logrus.Fatalf("error reading env variables from file: %s\n", err.Error())
+	}
+	cfg, err := config.New()
+	if err != nil {
 		logrus.Fatalf("error loading env variables: %s\n", err.Error())
 	}
 
-	db, err := repository.NewPostgresDB(repository.Config{
-		Driver:   os.Getenv("DB_DRIVER"),
-		Host:     os.Getenv("DB_HOST"),
-		Port:     os.Getenv("DB_PORT"),
-		Username: os.Getenv("DB_USER"),
-		Password: os.Getenv("DB_PASSWORD"),
-		DBName:   os.Getenv("DB_NAME"),
-		SSLMode:  os.Getenv("DB_SSL_MODE"),
-	})
+	db, err := repository.NewPostgresDB(*cfg)
 	if err != nil {
 		logrus.Fatalf("failed to initialize db: %s\n", err.Error())
 	}
-
 	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
-	handlers := handler.NewHandler(services)
+	loggerService, err := grpcClient.New(*cfg)
+	if err != nil {
+		logrus.Fatalf("failed to initialize grpc client: %s\n", err.Error())
+	}
+	handlers := handler.NewHandler(services, loggerService)
 
 	srv := new(Server)
 	go func() {
-		if err := srv.Run(os.Getenv("PORT"), handlers.InitRoutes()); err != nil {
+		if err := srv.Run(cfg.Server.Port, handlers.InitRoutes()); err != nil {
 			logrus.Fatalf("error while running http server: %s\n", err.Error())
 		}
 	}()
-	logrus.Print("app started on port ", os.Getenv("PORT"))
+	logrus.Print("app started on port ", cfg.Server.Port)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
@@ -78,9 +80,10 @@ type Server struct {
 }
 
 // Run - start
-func (s *Server) Run(port string, handler http.Handler) error {
+func (s *Server) Run(port int, handler http.Handler) error {
+	address := ":" + strconv.Itoa(port)
 	s.httpServer = &http.Server{
-		Addr:           ":" + port,
+		Addr:           address,
 		Handler:        handler,
 		MaxHeaderBytes: 1 << 20, // 1 MB
 		ReadTimeout:    10 * time.Second,
