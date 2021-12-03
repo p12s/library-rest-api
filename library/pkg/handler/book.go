@@ -1,14 +1,17 @@
 package handler
 
 import (
+	"context"
 	"strconv"
 	"time"
 
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/p12s/library-rest-api/library/pb"
 	"github.com/p12s/library-rest-api/library/pkg/models"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // @Summary Create
@@ -45,6 +48,30 @@ func (h *Handler) createBook(c *gin.Context) {
 		return
 	}
 
+	go func() {
+		_, err := h.grpcLogger.Service.Log(context.Background(), &pb.LoggerRequest{
+			Action:    pb.LoggerRequest_CREATE,
+			Entity:    pb.LoggerRequest_BOOK,
+			EntityId:  int64(id),
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("GRPC-logging create book: %s/n", err.Error())
+		}
+	}()
+
+	go func() {
+		err := h.queueLogger.Produce(pb.LoggerRequest{
+			Action:    pb.LoggerRequest_CREATE,
+			Entity:    pb.LoggerRequest_BOOK,
+			EntityId:  int64(id),
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("Queue-logging create book: %s/n", err.Error())
+		}
+	}()
+
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
 	})
@@ -78,6 +105,28 @@ func (h *Handler) getAllBooks(c *gin.Context) {
 		newErrorResponse(c, http.StatusNotFound, err.Error())
 		return
 	}
+
+	go func() {
+		_, err := h.grpcLogger.Service.Log(context.Background(), &pb.LoggerRequest{
+			Action:    pb.LoggerRequest_GET,
+			Entity:    pb.LoggerRequest_BOOK,
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("GRPC-logging get all books: %s/n", err.Error())
+		}
+	}()
+
+	go func() {
+		err := h.queueLogger.Produce(pb.LoggerRequest{
+			Action:    pb.LoggerRequest_GET,
+			Entity:    pb.LoggerRequest_BOOK,
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("Queue-logging get all books: %s/n", err.Error())
+		}
+	}()
 
 	c.JSON(http.StatusOK, items)
 }
@@ -117,6 +166,28 @@ func (h *Handler) getBookById(c *gin.Context) {
 		}
 		h.cache.SetWithExpire(strconv.Itoa(bookId), book, time.Hour*24)
 	}
+
+	go func() {
+		_, err := h.grpcLogger.Service.Log(context.Background(), &pb.LoggerRequest{
+			Action:    pb.LoggerRequest_GET,
+			Entity:    pb.LoggerRequest_BOOK,
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("GRPC-logging get book by id: %s/n", err.Error())
+		}
+	}()
+
+	go func() {
+		err := h.queueLogger.Produce(pb.LoggerRequest{
+			Action:    pb.LoggerRequest_GET,
+			Entity:    pb.LoggerRequest_BOOK,
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("Queue-logging get book by id: %s/n", err.Error())
+		}
+	}()
 
 	c.JSON(http.StatusOK, book)
 }
@@ -161,6 +232,30 @@ func (h *Handler) updateBook(c *gin.Context) {
 		return
 	}
 
+	go func() {
+		_, err := h.grpcLogger.Service.Log(context.Background(), &pb.LoggerRequest{
+			Action:    pb.LoggerRequest_UPDATE,
+			Entity:    pb.LoggerRequest_BOOK,
+			EntityId:  int64(bookId),
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("GRPC-logging update book: %s/n", err.Error())
+		}
+	}()
+
+	go func() {
+		err := h.queueLogger.Produce(pb.LoggerRequest{
+			Action:    pb.LoggerRequest_UPDATE,
+			Entity:    pb.LoggerRequest_BOOK,
+			EntityId:  int64(bookId),
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("Queue-logging update book: %s/n", err.Error())
+		}
+	}()
+
 	c.JSON(http.StatusOK, statusResponse{"OK"})
 }
 
@@ -196,6 +291,30 @@ func (h *Handler) deleteBook(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	go func() {
+		_, err := h.grpcLogger.Service.Log(context.Background(), &pb.LoggerRequest{
+			Action:    pb.LoggerRequest_DELETE,
+			Entity:    pb.LoggerRequest_BOOK,
+			EntityId:  int64(bookId),
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("GRPC-logging delete book by id: %s/n", err.Error())
+		}
+	}()
+
+	go func() {
+		err := h.queueLogger.Produce(pb.LoggerRequest{
+			Action:    pb.LoggerRequest_DELETE,
+			Entity:    pb.LoggerRequest_BOOK,
+			EntityId:  int64(bookId),
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("Queue-logging delete book by id: %s/n", err.Error())
+		}
+	}()
 
 	h.cache.Delete(strconv.Itoa(bookId))
 

@@ -1,13 +1,10 @@
 version: '3.9'
 
 services:
-  db:
+  # APP WITH DB
+  postgres:
     restart: always
     image: postgres:latest
-    networks:
-      new:
-        aliases:
-          - database
     volumes:
       - ./.database/postgres/data:/var/lib/postgresql/data
     environment:
@@ -20,26 +17,63 @@ services:
       - DB_PASSWORD=qwerty
     env_file:
       - ./.env
-    networks:
-      - new
     volumes:
       - ./schema:/migrations
-    command: sh -c "./wait-for-postgres.sh db; /db-migrations" && [ "-path", "/migrations/", "-database",  "postgres://postgres:qwerty@db:5432/postgres?sslmode=disable", "up" ]
+    command: sh -c "./wait-for-postgres.sh postgres; /db-migrations" && [ "-path", "/migrations/", "-database",  "postgres://postgres:qwerty@postgres:5432/postgres?sslmode=disable", "up" ]
     depends_on:
-      - db
+      - postgres
   app:
+    restart: on-failure
     build:
       context: ./library
       dockerfile: Dockerfile
-    networks:
-      - new
-    command: sh -c "./wait-for-postgres.sh db; ./app"
+    command: sh -c "./wait-for-postgres.sh postgres; ./app"
     ports:
       - 80:80
     depends_on:
       - db-migrations
+      - logger
+      - logger-2
     environment:
       - DB_PASSWORD=qwerty
 
-networks:
-  new:
+  # LOGGER #1
+  mongo:
+    restart: always
+    image: mongo:5.0.4
+    volumes:
+      - './.database/mongo/data:/data/db'
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=g0langn1nja
+    ports:
+      - 27017:27017
+  logger:
+    build:
+      context: ./logger
+      dockerfile: Dockerfile
+    ports:
+      - 81:81
+    depends_on:
+      - mongo
+
+  # LOGGER #2
+  rabbitmq:
+    image: rabbitmq
+    command: rabbitmq-server
+    ports:
+      - 5672:5672
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 1
+  logger-2:
+    restart: on-failure
+    build:
+      context: ./logger-2
+      dockerfile: Dockerfile
+    ports:
+      - 82:82
+    depends_on:
+      - rabbitmq
