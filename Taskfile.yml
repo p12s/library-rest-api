@@ -27,7 +27,7 @@ tasks:
   tidy:
     cmds:
       - echo "Tidy..."
-      - GO111MODULE=on go mod tidy
+      - cd library && GO111MODULE=on go mod tidy && cd ..
 
   fmt:
     cmds:

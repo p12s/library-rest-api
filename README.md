@@ -22,8 +22,11 @@
 Download:
 ```sh
 git clone https://github.com/p12s/library-rest-api.git && cd library-rest-api
-mv .env.example .env
-docker-compose up -d
+mv library/.env.example library/.env
+mv logger/.env.example logger/.env
+mv logger-2/.env.example logger-2/.env
+
+docker-compose up --build
 ```
 Open in browser: http://localhost/swagger/index.html  
 Stop:  
@@ -36,6 +39,10 @@ You have to run the command manually.
 ```
 migrate -path ./schema -database 'postgres://postgres:qwerty@localhost:5432/postgres?sslmode=disable' up
 ```
+
+# Logging
+- service **logger** - logging with gRPC, saving into MongoDB  
+- service 2 **logger-2** - logging with RabbitMQ, simple printing into stdout  
 
 # 📌 Documentation
 * [OpenAPI](docs/README.md)
