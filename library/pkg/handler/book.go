@@ -49,14 +49,26 @@ func (h *Handler) createBook(c *gin.Context) {
 	}
 
 	go func() {
-		_, err := h.logger.Service.Log(context.Background(), &pb.LoggerRequest{
+		_, err := h.grpcLogger.Service.Log(context.Background(), &pb.LoggerRequest{
 			Action:    pb.LoggerRequest_CREATE,
 			Entity:    pb.LoggerRequest_BOOK,
 			EntityId:  int64(id),
 			Timestamp: timestamppb.Now(),
 		})
 		if err != nil {
-			logrus.Errorf("GRPC-logging create: %s/n", err.Error())
+			logrus.Errorf("GRPC-logging create book: %s/n", err.Error())
+		}
+	}()
+
+	go func() {
+		err := h.queueLogger.Produce(pb.LoggerRequest{
+			Action:    pb.LoggerRequest_CREATE,
+			Entity:    pb.LoggerRequest_BOOK,
+			EntityId:  int64(id),
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("Queue-logging create book: %s/n", err.Error())
 		}
 	}()
 
@@ -95,13 +107,24 @@ func (h *Handler) getAllBooks(c *gin.Context) {
 	}
 
 	go func() {
-		_, err := h.logger.Service.Log(context.Background(), &pb.LoggerRequest{
+		_, err := h.grpcLogger.Service.Log(context.Background(), &pb.LoggerRequest{
 			Action:    pb.LoggerRequest_GET,
 			Entity:    pb.LoggerRequest_BOOK,
 			Timestamp: timestamppb.Now(),
 		})
 		if err != nil {
-			logrus.Errorf("GRPC-logging get all: %s/n", err.Error())
+			logrus.Errorf("GRPC-logging get all books: %s/n", err.Error())
+		}
+	}()
+
+	go func() {
+		err := h.queueLogger.Produce(pb.LoggerRequest{
+			Action:    pb.LoggerRequest_GET,
+			Entity:    pb.LoggerRequest_BOOK,
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("Queue-logging get all books: %s/n", err.Error())
 		}
 	}()
 
@@ -145,13 +168,24 @@ func (h *Handler) getBookById(c *gin.Context) {
 	}
 
 	go func() {
-		_, err := h.logger.Service.Log(context.Background(), &pb.LoggerRequest{
+		_, err := h.grpcLogger.Service.Log(context.Background(), &pb.LoggerRequest{
 			Action:    pb.LoggerRequest_GET,
 			Entity:    pb.LoggerRequest_BOOK,
 			Timestamp: timestamppb.Now(),
 		})
 		if err != nil {
-			logrus.Errorf("GRPC-logging get by id: %s/n", err.Error())
+			logrus.Errorf("GRPC-logging get book by id: %s/n", err.Error())
+		}
+	}()
+
+	go func() {
+		err := h.queueLogger.Produce(pb.LoggerRequest{
+			Action:    pb.LoggerRequest_GET,
+			Entity:    pb.LoggerRequest_BOOK,
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("Queue-logging get book by id: %s/n", err.Error())
 		}
 	}()
 
@@ -199,14 +233,26 @@ func (h *Handler) updateBook(c *gin.Context) {
 	}
 
 	go func() {
-		_, err := h.logger.Service.Log(context.Background(), &pb.LoggerRequest{
+		_, err := h.grpcLogger.Service.Log(context.Background(), &pb.LoggerRequest{
 			Action:    pb.LoggerRequest_UPDATE,
 			Entity:    pb.LoggerRequest_BOOK,
 			EntityId:  int64(bookId),
 			Timestamp: timestamppb.Now(),
 		})
 		if err != nil {
-			logrus.Errorf("GRPC-logging update: %s/n", err.Error())
+			logrus.Errorf("GRPC-logging update book: %s/n", err.Error())
+		}
+	}()
+
+	go func() {
+		err := h.queueLogger.Produce(pb.LoggerRequest{
+			Action:    pb.LoggerRequest_UPDATE,
+			Entity:    pb.LoggerRequest_BOOK,
+			EntityId:  int64(bookId),
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("Queue-logging update book: %s/n", err.Error())
 		}
 	}()
 
@@ -247,14 +293,26 @@ func (h *Handler) deleteBook(c *gin.Context) {
 	}
 
 	go func() {
-		_, err := h.logger.Service.Log(context.Background(), &pb.LoggerRequest{
+		_, err := h.grpcLogger.Service.Log(context.Background(), &pb.LoggerRequest{
 			Action:    pb.LoggerRequest_DELETE,
 			Entity:    pb.LoggerRequest_BOOK,
 			EntityId:  int64(bookId),
 			Timestamp: timestamppb.Now(),
 		})
 		if err != nil {
-			logrus.Errorf("GRPC-logging get by id: %s/n", err.Error())
+			logrus.Errorf("GRPC-logging delete book by id: %s/n", err.Error())
+		}
+	}()
+
+	go func() {
+		err := h.queueLogger.Produce(pb.LoggerRequest{
+			Action:    pb.LoggerRequest_DELETE,
+			Entity:    pb.LoggerRequest_BOOK,
+			EntityId:  int64(bookId),
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("Queue-logging delete book by id: %s/n", err.Error())
 		}
 	}()
 

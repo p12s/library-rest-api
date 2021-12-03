@@ -38,7 +38,7 @@ func (h *Handler) signUp(c *gin.Context) {
 	}
 
 	go func() {
-		_, err := h.logger.Service.Log(context.Background(), &pb.LoggerRequest{
+		_, err := h.grpcLogger.Service.Log(context.Background(), &pb.LoggerRequest{
 			Action:    pb.LoggerRequest_REGISTER,
 			Entity:    pb.LoggerRequest_USER,
 			EntityId:  int64(id),
@@ -46,6 +46,18 @@ func (h *Handler) signUp(c *gin.Context) {
 		})
 		if err != nil {
 			logrus.Errorf("GRPC-logging signup user: %s/n", err.Error())
+		}
+	}()
+
+	go func() {
+		err := h.queueLogger.Produce(pb.LoggerRequest{
+			Action:    pb.LoggerRequest_REGISTER,
+			Entity:    pb.LoggerRequest_USER,
+			EntityId:  int64(id),
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("Queue-logging signup user: %s/n", err.Error())
 		}
 	}()
 
@@ -86,13 +98,24 @@ func (h *Handler) signIn(c *gin.Context) {
 	}
 
 	go func() {
-		_, err := h.logger.Service.Log(context.Background(), &pb.LoggerRequest{
+		_, err := h.grpcLogger.Service.Log(context.Background(), &pb.LoggerRequest{
 			Action:    pb.LoggerRequest_LOGIN,
 			Entity:    pb.LoggerRequest_USER,
 			Timestamp: timestamppb.Now(),
 		})
 		if err != nil {
 			logrus.Errorf("GRPC-logging login user: %s/n", err.Error())
+		}
+	}()
+
+	go func() {
+		err := h.queueLogger.Produce(pb.LoggerRequest{
+			Action:    pb.LoggerRequest_LOGIN,
+			Entity:    pb.LoggerRequest_USER,
+			Timestamp: timestamppb.Now(),
+		})
+		if err != nil {
+			logrus.Errorf("Queue-logging login user: %s/n", err.Error())
 		}
 	}()
 

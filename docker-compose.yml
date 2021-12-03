@@ -1,6 +1,7 @@
 version: '3.9'
 
 services:
+  # APP WITH DB
   postgres:
     restart: always
     image: postgres:latest
@@ -22,6 +23,7 @@ services:
     depends_on:
       - postgres
   app:
+    restart: on-failure
     build:
       context: ./library
       dockerfile: Dockerfile
@@ -30,9 +32,12 @@ services:
       - 80:80
     depends_on:
       - db-migrations
+      - logger
+      - logger-2
     environment:
       - DB_PASSWORD=qwerty
-      
+
+  # LOGGER #1
   mongo:
     restart: always
     image: mongo:5.0.4
@@ -51,3 +56,24 @@ services:
       - 81:81
     depends_on:
       - mongo
+
+  # LOGGER #2
+  rabbitmq:
+    image: rabbitmq
+    command: rabbitmq-server
+    ports:
+      - 5672:5672
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 1
+  logger-2:
+    restart: on-failure
+    build:
+      context: ./logger-2
+      dockerfile: Dockerfile
+    ports:
+      - 82:82
+    depends_on:
+      - rabbitmq
