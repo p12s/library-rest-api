@@ -6,15 +6,10 @@
 
 <div align="center">
 
-[![GO][go-badge]][go-url] [![REPORT][report-badge]][report-url] [![LICENSE][license-badge]][license-url]
+[![LICENSE][license-badge]][license-url]
   
 [license-badge]: https://img.shields.io/npm/l/@douyinfe/semi-ui
 [license-url]: https://github.com/p12s/library-rest-api/blob/master/LICENSE
-[go-badge]: https://img.shields.io/github/go-mod/go-version/p12s/library-rest-api?style=plastic
-[go-url]: https://github.com/p12s/library-rest-api/blob/master/go.mod
-[report-badge]: https://goreportcard.com/badge/github.com/p12s/library-rest-api
-[report-url]: https://goreportcard.com/report/github.com/p12s/library-rest-api
-
 </div>
 </div>
 
@@ -40,9 +35,21 @@ You have to run the command manually.
 migrate -path ./schema -database 'postgres://postgres:qwerty@localhost:5432/postgres?sslmode=disable' up
 ```
 
-# Logging
-- service **logger** - logging with gRPC, saving into MongoDB  
-- service 2 **logger-2** - logging with RabbitMQ, simple printing into stdout  
+# What is going on here  
+  
+1. What does the library do:  
+- can register/authorize a user  
+- can create/update/delete the book  
+  
+2. What does the asuncronus logger (gRPC-client + gRPC-server) do:  
+- can send any handler-action to logger-service  
+  
+3. What does the asuncronus logger-2 (RabbitMQ-producer + RabbitMQ-consumer) do:   
+- can send any handler-action to logger-service  
+  
+# Logging services
+- **logger** - logging with gRPC, saving into MongoDB  
+- **logger-2** - logging with RabbitMQ, simple printing into stdout  
 
 # 📌 Documentation
 * [OpenAPI](docs/README.md)
