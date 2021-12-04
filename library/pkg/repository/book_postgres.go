@@ -9,7 +9,7 @@ import (
 	"github.com/p12s/library-rest-api/library/pkg/models"
 )
 
-// Book - book commands
+// Book - book contract
 type Book interface {
 	CreateBook(book models.Book) (int, error)
 	GetAllBook() ([]models.Book, error)

@@ -4,10 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 
+	_ "github.com/golang/mock/mockgen/model"
 	"github.com/p12s/library-rest-api/library/pkg/config"
 	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )
+
+// Queue - queue contract
+type Queue interface {
+	Close() error
+	Produce(payload interface{}) error
+}
 
 // QueueClient
 type QueueClient struct {

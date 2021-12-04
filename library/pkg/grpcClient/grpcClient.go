@@ -16,7 +16,7 @@ type Client struct {
 
 // New
 func New(cfg config.Config) (*Client, error) {
-	conn, err := grpc.Dial(cfg.Logger.Host, grpc.WithInsecure())
+	conn, err := grpc.Dial(cfg.Logger.Host, grpc.WithInsecure()) // nolint
 	if err != nil {
 		logrus.Fatalf("error grpc client: %s\n", err.Error())
 		return nil, fmt.Errorf("error grpc client: %w\n", err)
